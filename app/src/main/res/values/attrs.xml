@@ -1,0 +1,24 @@
+<resources>
+    <declare-styleable name="AppWidgetAttrs">
+        <attr name="appWidgetPadding" format="dimension" />
+        <attr name="appWidgetInnerRadius" format="dimension" />
+        <attr name="appWidgetRadius" format="dimension" />
+    </declare-styleable>
+<!--
+    <declare-styleable name="ArcSlider">
+        <attr name="arcBarColor" format="color"/>
+        <attr name="arcBarThickness" format="float"/>
+
+        <attr name="progressBarColor" format="color"/>
+        <attr name="progressBarThickness" format="float"/>
+
+        <attr name="minValue" format="float"/>
+        <attr name="maxValue" format="float"/>
+
+        <attr name="selectorStrokeColor" format="float"/>
+        <attr name="selectorColor" format="float"/>
+        <attr name="selectorSize" format="float"/>
+
+    </declare-styleable>
+    -->
+</resources>
