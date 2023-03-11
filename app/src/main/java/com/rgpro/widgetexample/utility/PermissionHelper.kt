@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat
 
 
 class PermissionHelper {
@@ -29,13 +31,7 @@ class PermissionHelper {
             }
             return !isAllPermissionsEnabled
         }
-        fun requestAllPermissions(ctx: Activity?) {
-            ActivityCompat.requestPermissions(
-                ctx!!, AllPermissions, REQUEST_ALL_PERMISSIONS_CODE
-            )
-        }
 
-        /** Launch Application Setting to grant permission.  */
         fun launchPermissionSettings(ctx: Context) {
             val intent = Intent()
             intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS

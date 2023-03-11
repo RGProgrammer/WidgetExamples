@@ -4,16 +4,15 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.WidgetExample.AppWidgetContainer">
 
-    <TextView
-        android:id="@+id/appwidget_text"
-        style="@style/Widget.WidgetExample.AppWidget.InnerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_audio_recorder_text"
-        android:text="@string/appwidget_audio_recorder_text"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
+    <ImageView
+        android:id="@+id/recorder_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/ic_record_button"
+        android:contentDescription="@string/appwidget_audio_recorder_text" />
 </RelativeLayout>
