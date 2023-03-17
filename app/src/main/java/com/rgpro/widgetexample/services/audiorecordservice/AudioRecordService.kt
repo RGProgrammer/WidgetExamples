@@ -19,35 +19,26 @@ import java.util.*
 class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
     companion object {
         val TAG = AudioRecordService::class.simpleName
+        const val ACTION_BROADCAST_AUDIO_RECORD_STATE_CHANGE =
+            "com.rgpro.services.AudioRecordService.STATE_CHANGED_BROADCAST"
+        const val  EXTRA_RECORD_STATE =  "state"
+        const val  EXTRA_ENABLE_BROADCAST ="broadcast"
+        const val STATE_ERROR_RECORDING = 0
+        const val STATE_STARTED_RECORDING = 1
+        const val STATE_STOPPED_RECORDING = 2
         private var default_outDirectory = "";
         val DEFAULT_OUT_DIRECTORY: String
             get() = default_outDirectory
         val default_MaxDuration = 20000 // 20 seconds
-        //default notification Text
-        private var notificationText = mutableMapOf<String,String> ().also{
-            it.put("title", "Audio Recording Service" )
-            it.put("ready","Service is ready to record")
-            it.put("recording" , "Recording")
 
-        }
-        public fun updateNotificationKeyValue(source : Map<String,String> ) {
-            if(source.containsKey("title"))
-                AudioRecordService.notificationText["title"]= source["title"] as String
-
-            if(source.containsKey("ready"))
-                AudioRecordService.notificationText["ready"]= source["ready"] as String
-
-            if(source.containsKey("recording"))
-                AudioRecordService.notificationText["recording"]= source["recording"]as String
-        }
     }
-
     inner class AudioRecordServiceBridge(val service: AudioRecordService) : Binder() {
     }
     interface OnRecordStatusChangedListener{
         fun onStatusChanged(context : Context, state : Int, errorMsg : String? = null ) ;
     }
 
+    private var sendStateChangeBroadcast = false
     private var recorder: MediaRecorder? = null
     private var binder = AudioRecordServiceBridge(this)
     private var filename: String = ""
@@ -78,6 +69,13 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        //TODO read extra parameter from Intent
+        intent?.let {
+            sendStateChangeBroadcast = it.getBooleanExtra(EXTRA_ENABLE_BROADCAST,false )
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -133,15 +131,18 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
             recorder?.prepare();
             recorder?.start();
             isRecording = true;
-            onStatusChangedListener?.onStatusChanged(this,1,null);
+            onStatusChangedListener?.onStatusChanged(this, STATE_STARTED_RECORDING,null);
+            if(sendStateChangeBroadcast) sendStateBroadcast(STATE_STARTED_RECORDING)
         } catch (e: IOException) {
             isRecording = false;
             Log.e(TAG, "startRecording: ", e)
-            onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
+            onStatusChangedListener?.onStatusChanged(this, STATE_ERROR_RECORDING,e.message) // error
+            if(sendStateChangeBroadcast) sendStateBroadcast(STATE_ERROR_RECORDING)
         } catch (e: IllegalStateException) {
             isRecording = false;
             Log.e(TAG, "startRecording: ", e)
-            onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
+            onStatusChangedListener?.onStatusChanged(this,STATE_ERROR_RECORDING,e.message) // error
+            if(sendStateChangeBroadcast) sendStateBroadcast(STATE_ERROR_RECORDING)
         }
 
     }
@@ -151,9 +152,11 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
             if(isRecording) {
                 try {
                     it.stop()
-                    onStatusChangedListener?.onStatusChanged(this,2,null);
+                    onStatusChangedListener?.onStatusChanged(this, STATE_STOPPED_RECORDING,null);
+                    if(sendStateChangeBroadcast) sendStateBroadcast(STATE_STOPPED_RECORDING)
                 } catch (e:Exception) {
-                    onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
+                    onStatusChangedListener?.onStatusChanged(this, STATE_ERROR_RECORDING,e.message) // error
+                    if(sendStateChangeBroadcast) sendStateBroadcast(STATE_ERROR_RECORDING)
                 }
 
             }
@@ -175,7 +178,13 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
         Log.d(TAG,"max duration set to $duration")
         maxDuration = duration ;
     }
-
+    private fun sendStateBroadcast (state : Int ){
+        val broadcastIntent = Intent().also {
+            it.action = ACTION_BROADCAST_AUDIO_RECORD_STATE_CHANGE
+            it.putExtra(EXTRA_RECORD_STATE,state)
+        }
+        sendBroadcast(broadcastIntent)
+    }
     override fun onInfo(mr: MediaRecorder?, what: Int, extra: Int) {
         if(what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED ||
             what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED){

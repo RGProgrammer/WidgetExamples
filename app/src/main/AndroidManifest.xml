@@ -23,13 +23,16 @@
         <service
             android:name="com.rgpro.widgetexample.services.audiorecordservice.AudioRecordService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true"
+            />
 
         <receiver
             android:name=".widgets.AudioRecorder"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.rgpro.services.AudioRecordService.STATE_CHANGED_BROADCAST" />
+                <action android:name="com.rgpro.widgets.ACTION_AUDIO_SERVICE_CONTROL"/>
             </intent-filter>
 
             <meta-data
