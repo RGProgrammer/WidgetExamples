@@ -29,7 +29,7 @@ class PermissionHelper {
                     permission
                 ) == PackageManager.PERMISSION_GRANTED)
             }
-            return !isAllPermissionsEnabled
+            return isAllPermissionsEnabled
         }
 
         fun launchPermissionSettings(ctx: Context) {

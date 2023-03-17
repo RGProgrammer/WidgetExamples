@@ -3,6 +3,7 @@ package com.rgpro.widgetexample.services.audiorecordservice
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.media.MediaRecorder
 import android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED
@@ -44,7 +45,7 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
     inner class AudioRecordServiceBridge(val service: AudioRecordService) : Binder() {
     }
     interface OnRecordStatusChangedListener{
-        fun onStatusChanged(state : Int , errorMsg : String? = null ) ;
+        fun onStatusChanged(context : Context, state : Int, errorMsg : String? = null ) ;
     }
 
     private var recorder: MediaRecorder? = null
@@ -110,7 +111,7 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
             Log.e(TAG, "error ${e.message}");
             recorder?.release();
             recorder = null;
-            onStatusChangedListener?.onStatusChanged(0,e.message) // error
+            onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
             return false;
         }
         return true;
@@ -132,16 +133,15 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
             recorder?.prepare();
             recorder?.start();
             isRecording = true;
-            onStatusChangedListener?.onStatusChanged(1,null);
-            Log.d(TAG, "startRecording: started")
+            onStatusChangedListener?.onStatusChanged(this,1,null);
         } catch (e: IOException) {
             isRecording = false;
             Log.e(TAG, "startRecording: ", e)
-            onStatusChangedListener?.onStatusChanged(0,e.message) // error
+            onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
         } catch (e: IllegalStateException) {
             isRecording = false;
             Log.e(TAG, "startRecording: ", e)
-            onStatusChangedListener?.onStatusChanged(0,e.message) // error
+            onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
         }
 
     }
@@ -151,9 +151,9 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
             if(isRecording) {
                 try {
                     it.stop()
-                    onStatusChangedListener?.onStatusChanged(2,null);
+                    onStatusChangedListener?.onStatusChanged(this,2,null);
                 } catch (e:Exception) {
-                    onStatusChangedListener?.onStatusChanged(0,e.message) // error
+                    onStatusChangedListener?.onStatusChanged(this,0,e.message) // error
                 }
 
             }
@@ -161,7 +161,7 @@ class AudioRecordService : Service(), MediaRecorder.OnInfoListener {
 
         }
         isRecording = false;
-        Log.d(TAG, "stopRecording $onStatusChangedListener")
+
     }
 
     public fun isRecording(): Boolean {

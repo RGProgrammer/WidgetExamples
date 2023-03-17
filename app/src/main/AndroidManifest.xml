@@ -19,24 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WidgetExample"
         tools:targetApi="31">
-        <service
-            android:name=".SystemResourceMonitorService"
-            android:enabled="true"
-            android:exported="false"></service>
-
-        <receiver
-            android:name=".BatteryStatusReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_CHANGED" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-            </intent-filter>
-        </receiver>
 
         <service
-            android:name="com.rgpro.audio_background_record.audiorecordservice.AudioRecordService"
+            android:name="com.rgpro.widgetexample.services.audiorecordservice.AudioRecordService"
             android:enabled="true"
             android:exported="false" />
 
