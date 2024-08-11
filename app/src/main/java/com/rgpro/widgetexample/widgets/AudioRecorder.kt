@@ -98,10 +98,7 @@ class AudioRecorder : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context) {
-        if (!PermissionHelper.hasAllPermissions(context)) {
-            Toast.makeText(context, "Must grant all permissions", Toast.LENGTH_LONG).show()
-            PermissionHelper.launchPermissionSettings(context)
-        }
+
         val audioRecorderServiceIntent = Intent(context, AudioRecordService::class.java)
             .putExtra(AudioRecordService.EXTRA_ENABLE_BROADCAST, true)
 
